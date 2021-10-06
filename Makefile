@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-PYTHON_VERSIONS := 3.7 3.8 3.9
+PYTHON_VERSIONS := 3.7 3.8 3.9 3.10
 
 # $1 = package name
 define print_pkg_version_stmt
@@ -11,7 +11,7 @@ endef
 # $1 = docker image
 # $2 = package name
 define pkg_version
-	$(shell docker run -it --rm --entrypoint python $1 \
+	$(shell docker run --pull never -it --rm --entrypoint python $1 \
 		-c '$(call print_pkg_version_stmt,$2)')
 endef
 
@@ -24,7 +24,7 @@ build-%:
 	$(eval PYTHON_VERSION := $*)
 	@echo $$'\e[01;32m=== Building for Python $(PYTHON_VERSION) ===\e[0m'
 	$(eval VERSION := python$(PYTHON_VERSION))
-	docker build --no-cache \
+	docker build --no-cache --pull \
 		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
 		-t otkds/piptools:$(VERSION) .
 	$(eval PIPTOOLS_VERSION := \
