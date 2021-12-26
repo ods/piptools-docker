@@ -27,13 +27,19 @@ build-%:
 	docker build --no-cache --pull \
 		--build-arg PYTHON_VERSION=$(PYTHON_VERSION) \
 		-t otkds/piptools:$(VERSION) .
+	@echo
+	@echo $$'\e[01;32m--- To push images run: ---\e[0m'
+	@echo make push-$(PYTHON_VERSION)
+	@echo $$'\e[01;32m---------------------------\e[0m'
+	@echo
+
+
+.PHONY: push-%
+push-%:
+	$(eval VERSION := python$*)
 	$(eval PIPTOOLS_VERSION := \
 		$(call pkg_version,otkds/piptools:$(VERSION),pip-tools))
 	$(eval FULL_VERSION := $(VERSION)-$(PIPTOOLS_VERSION))
 	docker tag otkds/piptools:$(VERSION) otkds/piptools:$(FULL_VERSION)
-	@echo
-	@echo $$'\e[01;32m--- To push images run: ---\e[0m'
-	@echo "docker push otkds/piptools:$(VERSION)"
-	@echo "docker push otkds/piptools:$(FULL_VERSION)"
-	@echo $$'\e[01;32m---------------------------\e[0m'
-	@echo
+	docker push otkds/piptools:$(VERSION)
+	docker push otkds/piptools:$(FULL_VERSION)
